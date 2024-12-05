@@ -6,6 +6,8 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import DefaultLayout from "../../Layouts/DefaultLayout"; // Importamos el Layout
+import { Inertia } from "@inertiajs/inertia";
 
 export default function Login({
     status,
@@ -29,6 +31,8 @@ export default function Login({
     };
 
     return (
+        <DefaultLayout title="Login">
+
         <GuestLayout>
             <Head title="Log in" />
 
@@ -82,7 +86,7 @@ export default function Login({
                             }
                         />
                         <span className="ms-2 text-sm text-gray-600">
-                            Remember me
+                            Remember me 1
                         </span>
                     </label>
                 </div>
@@ -103,5 +107,7 @@ export default function Login({
                 </div>
             </form>
         </GuestLayout>
+        </DefaultLayout>
+
     );
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dateTime('fecha_hora');
             $table->text('descripcion');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('profesional_id')->constrained('profesionals')->onDelete('cascade');
+            $table->foreignId('profesional_id')->constrained('profesionales')->onDelete('cascade');
             $table->timestamps();
         });
     }
