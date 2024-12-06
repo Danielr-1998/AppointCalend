@@ -28,7 +28,7 @@ const Create = ({ profesionales }: Props) => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto py-6">
+        <div className="max-w-7xl mx-auto py-6 z-50">
             <form onSubmit={handleSubmit}>
                 <div className="mb-4">
                     <label htmlFor="fecha_hora" className="block text-sm font-medium text-gray-700">

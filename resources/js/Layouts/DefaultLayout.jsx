@@ -6,12 +6,12 @@ const DefaultLayout = ({ children, title }) => {
   const isRegisterPage = title === "Register";
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen"> {/* Asegura que el contenedor ocupe toda la altura */}
       {/* Sidebar - Solo mostrar si no estamos en login o registro */}
       {!isLoginPage && !isRegisterPage && <Sidebar />}
 
-      {/* Content Area */}
-      <div className="flex-1 ml-64 p-6">
+      {/* Contenido principal */}
+      <div className="flex-1 ml-64 p-6"> {/* Asegura el margen de 64px para el contenido */}
         {children}
       </div>
     </div>

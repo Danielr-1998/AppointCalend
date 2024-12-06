@@ -1,66 +1,60 @@
-// resources/js/Pages/Citas/Index.tsx
+import React, { useState } from 'react';
+import { usePage } from '@inertiajs/react';
+import ListCitas from './ListCitas';   // El componente para mostrar las citas en lista
+import Calendar from '@/Components/Calendar';    // El componente para mostrar el calendario
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import CreateCitaModal from '@/Components/CrearCitaModal'; // Importamos la modal de crear cita
 
-import React, { useEffect, useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import DefaultLayout from '@/Layouts/DefaultLayout';  // Asegúrate de importar el layout de la aplicación
+const Index: React.FC = () => {
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');  // Estado para alternar entre lista y calendario
+  const [isModalOpen, setIsModalOpen] = useState(false);  // Estado para controlar la visibilidad de la modal
+  const { citas, profesionales } = usePage().props;  // Asegúrate de que 'profesionales' se pase correctamente desde el backend
 
-interface Cita {
-    id: number;
-    fecha_hora: string;
-    descripcion: string;
-    profesional: {
-        name: string;
-    };
-}
+  // Verificar si `profesionales` es un arreglo antes de pasarlo al modal
+  const safeProfesionales = Array.isArray(profesionales) ? profesionales : [];
 
-export default function Index() {
-    const { citas } = usePage().props; // Accediendo a las citas pasadas desde el controlador
-    const [citasList, setCitasList] = useState<Cita[]>(citas);
-
-    useEffect(() => {
-        setCitasList(citas);
-    }, [citas]);
-
-    return (
-        <DefaultLayout title="Mis Citas">
-            <div className="max-w-7xl mx-auto p-6">
-                <div className="mb-4 flex justify-between items-center">
-                    <h2 className="text-2xl font-semibold text-gray-800">Mis Citas</h2>
-                    <Link href={route('citas.create')} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-                        Crear Cita
-                    </Link>
-                </div>
-
-                <div className="overflow-x-auto shadow rounded-lg">
-                    <table className="min-w-full bg-white">
-                        <thead>
-                            <tr>
-                                <th className="px-4 py-2 text-left border-b">Fecha y Hora</th>
-                                <th className="px-4 py-2 text-left border-b">Descripción</th>
-                                <th className="px-4 py-2 text-left border-b">Profesional</th>
-                                <th className="px-4 py-2 text-left border-b">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {citasList.map((cita) => (
-                                <tr key={cita.id} className="border-b">
-                                    <td className="px-4 py-2">{cita.fecha_hora}</td>
-                                    <td className="px-4 py-2">{cita.descripcion}</td>
-                                    <td className="px-4 py-2">{cita.profesional.name}</td>
-                                    <td className="px-4 py-2">
-                                        <Link
-                                            href={route('citas.show', cita.id)}
-                                            className="text-blue-600 hover:text-blue-800"
-                                        >
-                                            Ver Detalles
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+  return (
+    <AuthenticatedLayout>
+      <div className="flex">
+        {/* Sidebar */}
+        {/* Contenido principal */}
+        <div className="flex-1 p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-xl font-semibold leading-tight text-gray-800">Citas</h1>
+            <div>
+              {/* Botón para ver la lista */}
+              <button
+                onClick={() => setViewMode('list')}  // Cambiar a la vista de lista
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+              >
+                Ver Lista
+              </button>
+              {/* Botón para ver el calendario */}
+              <button
+                onClick={() => setViewMode('calendar')}  // Cambiar a la vista de calendario
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 ms-2"
+              >
+                Ver Calendario
+              </button>
+              {/* Botón para crear una nueva cita */}
+              <button
+                onClick={() => setIsModalOpen(true)}  // Mostrar la modal para crear cita
+                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 ms-2"
+              >
+                Crear Cita
+              </button>
             </div>
-        </DefaultLayout>
-    );
-}
+          </div>
+
+          {/* Dependiendo del estado 'viewMode', mostramos el componente correspondiente */}
+          {viewMode === 'calendar' ? <Calendar citas={citas} /> : <ListCitas citas={citas} />}
+        </div>
+      </div>
+
+      {/* Mostrar modal si isModalOpen es true */}
+      {isModalOpen && <CreateCitaModal onClose={() => setIsModalOpen(false)} profesionales={safeProfesionales} />}
+    </AuthenticatedLayout>
+  );
+};
+
+export default Index;

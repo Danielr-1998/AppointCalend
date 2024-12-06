@@ -22,12 +22,16 @@ class CitaController extends Controller
      */
     public function index()
     {
-        // Obtener todas las citas del usuario autenticado
+         // Obtén las citas con el profesional relacionado para el usuario autenticado
         $citas = Cita::with('profesional')->where('user_id', Auth::id())->get();
-        
-        // Retornar las citas a la vista de Inertia
+
+        // Obtén la lista de todos los profesionales
+        $profesionales = Profesional::all();
+
+        // Pasar tanto las citas como los profesionales al frontend
         return Inertia::render('Citas/Index', [
-            'citas' => $citas,
+            'citas' => $citas->toArray(),
+            'profesionales' => $profesionales->toArray(), // Asegúrate de pasar los profesionales aquí
         ]);
     }
 
