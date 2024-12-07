@@ -90,4 +90,16 @@ class CitaController extends Controller
             'cita' => $cita,
         ]);
     }
+    public function updateEstado($id, $estado)
+    {
+        // Buscar la cita por id
+        $cita = Cita::findOrFail($id);
+    
+        // Actualizar el estado
+        $cita->estado = $estado;  // El estado ahora viene desde la URL
+        $cita->save();
+    
+        // Responder con un mensaje de éxito
+        return redirect()->route('citas.index')->with('estadoActualizado', 'Estado actualizado correctamente');
+    }
 }

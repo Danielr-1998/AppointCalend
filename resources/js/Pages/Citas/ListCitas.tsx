@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTable, useFilters, usePagination } from 'react-table';
-import { usePage } from '@inertiajs/react';
-import { Cita } from '@/types/Cita'; // Asegúrate de tener el tipo de datos de Cita
+import { usePage, useForm } from '@inertiajs/react'; // Usamos useForm para hacer la petición PUT
+import { Cita } from '@/types/Cita';
 
 // Filtro por columna (por defecto)
 const DefaultColumnFilter = ({ column: { filterValue, setFilter } }: any) => (
@@ -12,7 +12,6 @@ const DefaultColumnFilter = ({ column: { filterValue, setFilter } }: any) => (
     className="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
   />
 );
-
 
 // Filtro para fecha (por defecto)
 const DateColumnFilter = ({ column: { filterValue, setFilter } }: any) => (
@@ -25,9 +24,27 @@ const DateColumnFilter = ({ column: { filterValue, setFilter } }: any) => (
   />
 );
 
-
 const ListCitas: React.FC = () => {
   const { citas } = usePage().props as { citas: Cita[] }; // Aseguramos que citas es un array de Cita
+
+  // Usamos useForm para realizar la solicitud PUT
+  const { put } = useForm();
+
+  // Función para actualizar el estado de la cita utilizando Inertia (a través de useForm)
+  const handleEstadoChange = (id: number, estado: string) => {
+    console.log("estado", estado);
+    
+    // Usamos useForm.put para hacer la solicitud PUT
+    put(`/citas/${id}/estado/${estado}`, {
+      onSuccess: () => {
+        console.log('Estado actualizado correctamente');
+      },
+      onError: (error) => {
+        console.error('Error al actualizar estado:', error);
+      }
+    });
+  };
+  
 
   // Definir las columnas de la tabla
   const columns = React.useMemo(
@@ -48,9 +65,61 @@ const ListCitas: React.FC = () => {
         accessor: 'profesional.nombre', // Asegúrate de que el nombre del profesional esté bien accesible
         Filter: DefaultColumnFilter, // Filtro para la columna
       },
+      {
+        Header: 'Estado',
+        accessor: 'estado', // Asumiendo que el campo estado está en la cita
+        Filter: DefaultColumnFilter, // Filtro para la columna
+        Cell: ({ value }: any) => (
+          <span className={`px-2 py-1 rounded-md text-xs ${getEstadoClass(value)}`}>
+            {value}
+          </span>
+        ),
+      },
+      {
+        Header: 'Acciones',
+        Cell: ({ row }: any) => {
+          const { id, estado } = row.original; // Accedemos a los datos de la cita
+          return (
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleEstadoChange(id, 'atendida')}
+                className="px-3 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-green-600"
+              >
+                Atendida
+              </button>
+              <button
+                onClick={() => handleEstadoChange(id, 'cancelada')}
+                className="px-3 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-600"
+              >
+                Cancelada
+              </button>
+              <button
+                onClick={() => handleEstadoChange(id, 'reprogramada')}
+                className="px-3 py-1 bg-yellow-500 text-white rounded-md text-xs hover:bg-yellow-600"
+              >
+                Reprogramada
+              </button>
+            </div>
+          );
+        },
+      },
     ],
     []
   );
+
+  // Función para devolver clases según el estado
+  const getEstadoClass = (estado: string) => {
+    switch (estado) {
+      case 'atendida':
+        return 'bg-green-100 text-green-800';
+      case 'cancelada':
+        return 'bg-red-100 text-red-800';
+      case 'reprogramada':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   // Usamos react-table para configurar la tabla
   const {
